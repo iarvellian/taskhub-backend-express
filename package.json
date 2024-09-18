@@ -1,0 +1,24 @@
+{
+  "name": "backend-taskhub",
+  "version": "1.0.0",
+  "description": "A simple Express.js web application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "web",
+    "server",
+    "api"
+  ],
+  "author": "iarvellian",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "mysql2": "^3.11.3",
+    "sequelize": "^6.37.3",
+    "sequelize-cli": "^6.6.2"
+  }
+}
