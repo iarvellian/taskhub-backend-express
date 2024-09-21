@@ -1,18 +1,20 @@
+require ('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const authRoutes = require('./routes/authRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 
-// Enable CORS for your frontend
+// Enable CORS as middleware for your frontend
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(cookieParser());
 
-// A sample route
-app.get('/api/tasks', (req, res) => {
-  res.json([
-    { id: 1, title: 'Task 1', completed: false },
-    { id: 2, title: 'Task 2', completed: true }
-  ]);
-});
+// Routes
+app.use('/api/v1', authRoutes);
+// app.use('/api/v1/tasks', taskRoutes);
 
 const port = 5000;
 app.listen(port, () => {
