@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/v1", authRoutes);
 app.use("/api/v1/profile", userRoutes);
+app.use("/api/v1/projects", projectRoutes);
 
 // Start the server on a specific port
 const port = 5000;
