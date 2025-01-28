@@ -1,40 +1,32 @@
 const { User } = require("../models");
 const bcrypt = require("bcrypt");
-const { check, validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");
+const authRules = require("../utils/validators/authRules");
 const { signAccessToken, signRefreshToken } = require("../utils/tokenUtils");
-
-// Password validation function (at least 8 characters, one symbol, and one number)
-const validatePassword = (password) => {
-  const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
-  return regex.test(password);
-};
 
 // User registration
 exports.register = [
-  // Input validation middleware
-  check("name", "Name is required").notEmpty(),
-  check("email", "Email is required").notEmpty(),
-  check("password", "Password is required").notEmpty(),
-
-  check("email", "Invalid email format")
-    .if((value, { req }) => req.body.email)
-    .isEmail(),
-  check("password", "Password must be at least 8 characters and contain at least one symbol and one number")
-    .if((value, { req }) => req.body.password)
-    .custom(validatePassword),
-
+  ...authRules.register,
   async (req, res) => {
-    const { name, email, password } = req.body;
-
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      // Get only the first error per field
+      const uniqueErrors = {};
+      errors.array().forEach((err) => {
+        if (!uniqueErrors[err.path]) {
+          uniqueErrors[err.path] = err;
+        }
+      });
+
       return res.status(400).json({
         status: "fail",
         message: "Invalid input data",
         errors: errors.array(),
       });
     }
+
+    const { name, email, password } = req.body;
 
     try {
       // Check if user already exists
@@ -106,22 +98,27 @@ exports.refreshToken = async (req, res) => {
 
 // Login with detailed error handling
 exports.login = [
-  // Input validation middleware
-  check("email", "Email is required").notEmpty(),
-  check("password", "Password is required").notEmpty(),
-
+  ...authRules.login,
   async (req, res) => {
-    const { email, password } = req.body;
-
     // Validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      // Get only the first error per field
+      const uniqueErrors = {};
+      errors.array().forEach((err) => {
+        if (!uniqueErrors[err.path]) {
+          uniqueErrors[err.path] = err;
+        }
+      });
+
       return res.status(400).json({
         status: "fail",
         message: "Invalid input data",
         errors: errors.array(),
       });
     }
+    
+    const { email, password } = req.body;
 
     try {
       const user = await User.findOne({ where: { email } });

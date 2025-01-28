@@ -2,6 +2,7 @@ const { User } = require("../models");
 const { check, validationResult } = require("express-validator");
 const multer = require("multer");
 const path = require("path");
+const userRules = require("../utils/validators/userRules");
 
 // Configure multer for file uploads (profile pictures)
 const storage = multer.diskStorage({
@@ -68,17 +69,7 @@ exports.getProfile = async (req, res) => {
 
 // Update user profile
 exports.updateProfile = [
-  // Validation middleware
-  check("name", "Name is required").optional().notEmpty(),
-  check("email", "Invalid email format").optional().isEmail(),
-  check("password", "Password must be at least 8 characters and contain at least one symbol and one number")
-    .optional()
-    .custom((value) => {
-      if (!value) return true; // Skip validation if no password is provided
-      const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
-      return regex.test(value);
-    }),
-
+  ...userRules.updateProfile,
   (req, res) => {
     upload(req, res, async (err) => {
       if (err) {
@@ -94,6 +85,14 @@ exports.updateProfile = [
       // Validate input
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        // Get only the first error per field
+        const uniqueErrors = {};
+        errors.array().forEach((err) => {
+          if (!uniqueErrors[err.path]) {
+            uniqueErrors[err.path] = err;
+          }
+        });
+
         return res.status(400).json({
           status: "fail",
           message: "Invalid input data",
