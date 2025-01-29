@@ -1,6 +1,16 @@
 const { check } = require('express-validator');
 const commonRules = require('./commonRules');
 const { User } = require('../../models');
+const { Project } = require('../../models');
+
+// Custom validator to check if project_id exists in the projects table
+const projectExists = async (value) => {
+    const project = await Project.findByPk(value); // or findOne depending on your ORM
+    if (!project) {
+      throw new Error('Project does not exist');
+    }
+    return true;
+};
 
 // Custom validator to check if user_id exists in the users table
 const userExists = async (value) => {
@@ -21,7 +31,7 @@ const taskRules = {
             .isIn(['low', 'medium', 'high']).withMessage('Invalid priority value'),
         check('project_id')
             .notEmpty().withMessage('Project is required').bail()
-            .isInt().withMessage('Invalid project'),
+            .custom(projectExists),
         check('assigned_to')
             .notEmpty().withMessage('Assignee is required').bail()
             .custom(userExists),
