@@ -9,6 +9,8 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const teamRoutes = require("./routes/teamRoutes");
+const teammemberRoutes = require("./routes/teammemberRoutes");
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use("/api/v1", authRoutes);
 app.use("/api/v1/profile", userRoutes);
 app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/tasks", taskRoutes);
+app.use("/api/v1/teams", teamRoutes);
+app.use("/api/v1/teammembers", teammemberRoutes);
 
 // Start the server on a specific port
 const port = 5000;
